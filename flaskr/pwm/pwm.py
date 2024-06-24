@@ -4,7 +4,11 @@ from flask import (
 )
 from . import db
 
+# define blueprints here
+
 bp = Blueprint('pwm', __name__, url_prefix='/pwm')
+
+test = Blueprint('test', __name__, url_prefix='/test')
 
 @bp.route('/user', methods=['GET'])
 def user():
@@ -113,4 +117,9 @@ def delete_user(user_id):
 def flask_img(filename):
     return current_app.send_static_file("img/"+filename)
 
-
+@test.route('/hello', methods=['GET'])
+def testJSON():
+    if request.method == 'GET':
+        resp = [{'ciao': "hello world!"}]
+        print("i received a request")
+        return jsonify(resp)
