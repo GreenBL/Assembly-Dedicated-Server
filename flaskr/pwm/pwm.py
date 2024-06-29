@@ -21,11 +21,11 @@ def user():
 
             users = cursor.fetchall()
             for user in users:
-                resp.append({'id': user['idUser'],
+                resp.append({'id': user['u_id'],
                              'username': user['username'], 
-                             'password': user['password'], 
-                             'nome': user['nome'],
-                             'cognome': user['cognome']
+                             'password': user['password']#, 
+                             #'nome': user['nome'],
+                             #'cognome': user['cognome']
                              })            
 
         except db.IntegrityError:

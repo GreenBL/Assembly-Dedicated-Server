@@ -11,8 +11,8 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DB_HOST='localhost',
         DB_USER='root',
-        DB_PASSWORD='mysqlpwm',
-        DB_DATABASE='pwm'
+        DB_PASSWORD='12345678',
+        DB_DATABASE='assembly'
     )
 
     db.init_app(app)
