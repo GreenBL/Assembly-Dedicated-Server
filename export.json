@@ -1,0 +1,158 @@
+{
+    "tables": [
+      {
+        "name": "users",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "email", "type": "VARCHAR(255)", "unique": true, "not_null": true },
+          { "name": "phone", "type": "VARCHAR(15)" },
+          { "name": "name", "type": "VARCHAR(255)" },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "product_categories",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(50)", "not_null": true },
+          { "name": "description", "type": "TEXT" }
+        ]
+      },
+      {
+        "name": "product_classes",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(50)", "not_null": true },
+          { "name": "description", "type": "TEXT" }
+        ]
+      },
+      {
+        "name": "products",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(255)", "not_null": true },
+          { "name": "description", "type": "TEXT" },
+          { "name": "category_id", "type": "INT", "not_null": true },
+          { "name": "class", "type": "ENUM('Standard', 'Gaming', 'Workstation')", "not_null": true },
+          { "name": "price", "type": "DECIMAL(10, 2)", "not_null": true },
+          { "name": "stock", "type": "INT", "not_null": true },
+          { "name": "image_url", "type": "VARCHAR(255)" },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ],
+        "foreign_keys": [
+          { "columns": ["category_id"], "references": {"table": "product_categories", "columns": ["id"]} },
+          { "columns": ["class"], "references": {"values": ["Standard", "Gaming", "Workstation"]} }
+        ]
+      },
+      {
+        "name": "product_attributes",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "product_id", "type": "INT", "not_null": true },
+          { "name": "attribute_name", "type": "VARCHAR(50)", "not_null": true },
+          { "name": "attribute_value", "type": "VARCHAR(255)", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["product_id"], "references": {"table": "products", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "addresses",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "user_id", "type": "INT", "not_null": true },
+          { "name": "address_line1", "type": "VARCHAR(255)", "not_null": true },
+          { "name": "address_line2", "type": "VARCHAR(255)" },
+          { "name": "city", "type": "VARCHAR(100)", "not_null": true },
+          { "name": "state", "type": "VARCHAR(100)", "not_null": true },
+          { "name": "country", "type": "VARCHAR(100)", "not_null": true },
+          { "name": "postal_code", "type": "VARCHAR(20)", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["user_id"], "references": {"table": "users", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "payments",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "user_id", "type": "INT", "not_null": true },
+          { "name": "card_number", "type": "VARCHAR(20)", "not_null": true },
+          { "name": "expiry_date", "type": "VARCHAR(7)", "not_null": true },
+          { "name": "cvv", "type": "VARCHAR(4)", "not_null": true },
+          { "name": "card_holder_name", "type": "VARCHAR(255)", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["user_id"], "references": {"table": "users", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "orders",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "user_id", "type": "INT", "not_null": true },
+          { "name": "total_amount", "type": "DECIMAL(10, 2)", "not_null": true },
+          { "name": "order_date", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" },
+          { "name": "status", "type": "ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled')", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["user_id"], "references": {"table": "users", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "order_items",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "order_id", "type": "INT", "not_null": true },
+          { "name": "product_id", "type": "INT", "not_null": true },
+          { "name": "quantity", "type": "INT", "not_null": true },
+          { "name": "unit_price", "type": "DECIMAL(10, 2)", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["order_id"], "references": {"table": "orders", "columns": ["id"]} },
+          { "columns": ["product_id"], "references": {"table": "products", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "shipping",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "order_id", "type": "INT", "not_null": true },
+          { "name": "address_id", "type": "INT", "not_null": true },
+          { "name": "shipping_date", "type": "TIMESTAMP" },
+          { "name": "status", "type": "ENUM('Pending', 'Shipped', 'Delivered')", "not_null": true }
+        ],
+        "foreign_keys": [
+          { "columns": ["order_id"], "references": {"table": "orders", "columns": ["id"]} },
+          { "columns": ["address_id"], "references": {"table": "addresses", "columns": ["id"]} }
+        ]
+      },
+      {
+        "name": "builder_configurations",
+        "columns": [
+          { "name": "id", "type": "INT", "primary_key": true, "auto_increment": true },
+          { "name": "user_id", "type": "INT", "not_null": true },
+          { "name": "name", "type": "VARCHAR(255)", "not_null": true },
+          { "name": "cpu_id", "type": "INT" },
+          { "name": "gpu_id", "type": "INT" },
+          { "name": "ram_id", "type": "INT" },
+          { "name": "storage_id", "type": "INT" },
+          { "name": "motherboard_id", "type": "INT" },
+          { "name": "case_id", "type": "INT" },
+          { "name": "psu_id", "type": "INT" },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ],
+        "foreign_keys": [
+          { "columns": ["user_id"], "references": {"table": "users", "columns": ["id"]} },
+          { "columns": ["cpu_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["gpu_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["ram_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["storage_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["motherboard_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["case_id"], "references": {"table": "products", "columns": ["id"]} },
+          { "columns": ["psu_id"], "references": {"table": "products", "columns": ["id"]} }
+        ]
+      }
+    ]
+  }
+  

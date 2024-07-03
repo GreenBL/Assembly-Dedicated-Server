@@ -1,0 +1,199 @@
+
+CREATE TABLE addresses
+(
+  id            INT          NULL     AUTO_INCREMENT,
+  user_id       INT          NOT NULL,
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255) NULL    ,
+  city          VARCHAR(100) NOT NULL,
+  state         VARCHAR(100) NOT NULL,
+  country       VARCHAR(100) NOT NULL,
+  postal_code   VARCHAR(20)  NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE builder_configurations
+(
+  id             INT          NULL     AUTO_INCREMENT,
+  user_id        INT          NOT NULL,
+  name           VARCHAR(255) NOT NULL,
+  cpu_id         INT          NULL    ,
+  gpu_id         INT          NULL    ,
+  ram_id         INT          NULL    ,
+  storage_id     INT          NULL    ,
+  motherboard_id INT          NULL    ,
+  case_id        INT          NULL    ,
+  psu_id         INT          NULL    ,
+  created_at     TIMESTAMP    NULL     DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE order_items
+(
+  id         INT           NULL     AUTO_INCREMENT,
+  order_id   INT           NOT NULL,
+  product_id INT           NOT NULL,
+  quantity   INT           NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE orders
+(
+  id           INT                                                  NULL     AUTO_INCREMENT,
+  user_id      INT                                                  NOT NULL,
+  total_amount DECIMAL(10,2)                                        NOT NULL,
+  order_date   TIMESTAMP                                            NULL     DEFAULT CURRENT_TIMESTAMP,
+  status       ENUM(Pending,Processing,Shipped,Delivered,Cancelled) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE payments
+(
+  id               INT          NULL     AUTO_INCREMENT,
+  user_id          INT          NOT NULL,
+  card_number      VARCHAR(20)  NOT NULL,
+  expiry_date      VARCHAR(7)   NOT NULL,
+  cvv              VARCHAR(4)   NOT NULL,
+  card_holder_name VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE product_attributes
+(
+  id              INT          NULL     AUTO_INCREMENT,
+  product_id      INT          NOT NULL,
+  attribute_name  VARCHAR(50)  NOT NULL,
+  attribute_value VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE product_categories
+(
+  id          INT         NULL     AUTO_INCREMENT,
+  name        VARCHAR(50) NOT NULL,
+  description TEXT        NULL    ,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE products
+(
+  id          INT                               NULL     AUTO_INCREMENT,
+  name        VARCHAR(255)                      NOT NULL,
+  description TEXT                              NULL    ,
+  category_id INT                               NOT NULL,
+  class       ENUM(Standard,Gaming,Workstation) NOT NULL,
+  price       DECIMAL(10,2)                     NOT NULL,
+  stock       INT                               NOT NULL,
+  image_url   VARCHAR(255)                      NULL    ,
+  created_at  TIMESTAMP                         NULL     DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE shipping
+(
+  id            INT                             NULL     AUTO_INCREMENT,
+  order_id      INT                             NOT NULL,
+  address_id    INT                             NOT NULL,
+  shipping_date TIMESTAMP                       NULL    ,
+  status        ENUM(Pending,Shipped,Delivered) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE users
+(
+  id         INT          NULL     AUTO_INCREMENT,
+  email      VARCHAR(255) NULL    ,
+  phone      VARCHAR(15)  NULL    ,
+  name       VARCHAR(255) NULL    ,
+  created_at TIMESTAMP    NULL     DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+ALTER TABLE users
+  ADD CONSTRAINT UQ_email UNIQUE (email);
+
+ALTER TABLE products
+  ADD CONSTRAINT FK_product_categories_TO_products
+    FOREIGN KEY (category_id)
+    REFERENCES product_categories (id);
+
+ALTER TABLE product_attributes
+  ADD CONSTRAINT FK_products_TO_product_attributes
+    FOREIGN KEY (product_id)
+    REFERENCES products (id);
+
+ALTER TABLE addresses
+  ADD CONSTRAINT FK_users_TO_addresses
+    FOREIGN KEY (user_id)
+    REFERENCES users (id);
+
+ALTER TABLE payments
+  ADD CONSTRAINT FK_users_TO_payments
+    FOREIGN KEY (user_id)
+    REFERENCES users (id);
+
+ALTER TABLE orders
+  ADD CONSTRAINT FK_users_TO_orders
+    FOREIGN KEY (user_id)
+    REFERENCES users (id);
+
+ALTER TABLE order_items
+  ADD CONSTRAINT FK_orders_TO_order_items
+    FOREIGN KEY (order_id)
+    REFERENCES orders (id);
+
+ALTER TABLE order_items
+  ADD CONSTRAINT FK_products_TO_order_items
+    FOREIGN KEY (product_id)
+    REFERENCES products (id);
+
+ALTER TABLE shipping
+  ADD CONSTRAINT FK_orders_TO_shipping
+    FOREIGN KEY (order_id)
+    REFERENCES orders (id);
+
+ALTER TABLE shipping
+  ADD CONSTRAINT FK_addresses_TO_shipping
+    FOREIGN KEY (address_id)
+    REFERENCES addresses (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_users_TO_builder_configurations
+    FOREIGN KEY (user_id)
+    REFERENCES users (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations
+    FOREIGN KEY (cpu_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations1
+    FOREIGN KEY (gpu_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations2
+    FOREIGN KEY (ram_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations3
+    FOREIGN KEY (storage_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations4
+    FOREIGN KEY (motherboard_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations5
+    FOREIGN KEY (case_id)
+    REFERENCES products (id);
+
+ALTER TABLE builder_configurations
+  ADD CONSTRAINT FK_products_TO_builder_configurations6
+    FOREIGN KEY (psu_id)
+    REFERENCES products (id);
