@@ -11,7 +11,7 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DB_HOST='localhost',
         DB_USER='root',
-        DB_PASSWORD='12345678',
+        DB_PASSWORD='pwm',
         DB_DATABASE='assembly'
     )
 

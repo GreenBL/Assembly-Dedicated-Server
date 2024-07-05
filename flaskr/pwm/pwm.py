@@ -35,25 +35,25 @@ def user():
     return jsonify(resp)
 
 
-@bp.route('/user/<int:user_id>', methods=['GET'])
+@bp.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     connection = db.getdb()
     resp = {}
     try:
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM User WHERE idUser = %s", (user_id,))
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         if user:
-            resp = {'id': user['idUser'],
-                    'username': user['username'], 
-                    'password': user['password'], 
-                    'nome': user['nome'],
-                    'cognome': user['cognome']
+            resp = {'id': user['id'],
+                    'email': user['email'], 
+                    'phone': user['phone'], 
+                    'name': user['name'],
+                    'created_at' : user['created_at']
                     }
         else:
-            resp = {'error': 'User not found'}
-    except db.IntegrityError:
-        resp = {'error': 'Error retrieving user'}
+            resp = {'status': 'failure', 'message' : "User not found"}
+    except db.Error:
+        resp = {'status': 'failure', 'message' : "Internal server error"}
     finally:
         cursor.close()
     return jsonify(resp)
@@ -76,6 +76,44 @@ def create_user():
         resp = {'error': 'Error creating user'}
     finally:
         cursor.close()
+    return jsonify(resp)
+
+@bp.route('/login', methods=['POST'])
+def authenticate_user():
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    resp = {}
+
+    print(f'login request by: {email} using {password}')
+
+    connection = db.getdb()
+
+    if email == "debug@unipa.it": # DEBUG SUPER USER
+        resp = {'status' : 'success', 'message' : '1'}
+        return resp
+    
+    try:
+        cursor = connection.cursor()\
+        
+        cursor.execute(
+            """ SELECT id
+                FROM users
+                WHERE email = %s AND password = %s
+            """,
+        (email, password))
+
+        user = cursor.fetchone()
+        
+        if user:
+            resp = {'status' : 'success', 'message' : user[0]}
+        else:
+            resp = {'status' : 'failure', 'message' : 'user not found'}
+    except db.IntegrityError:
+        resp = {'status' : 'failure', 'message' : "error"}
+    finally:
+        cursor.close()
+
     return jsonify(resp)
 
 
